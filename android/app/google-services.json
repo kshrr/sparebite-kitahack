@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "943494248130",
+    "project_id": "food-rescue-2326e",
+    "storage_bucket": "food-rescue-2326e.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:943494248130:android:d9d58bcee59c5e0c582d5b",
+        "android_client_info": {
+          "package_name": "com.example.food_rescue"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDcgspeKSAIBz-Km2kY3MiJOhfN41Y1m44"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
