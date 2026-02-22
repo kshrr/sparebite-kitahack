@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:food_rescue/screens/main_navigation.dart';
 import 'dashboard.dart'; 
 
 class AuthPage extends StatefulWidget {
@@ -24,7 +25,7 @@ class _AuthPageState extends State<AuthPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("SpareBite"),
+        title: const Text("Sparebite"),
         centerTitle: true,
       ),
 
@@ -173,7 +174,7 @@ class _AuthPageState extends State<AuthPage> {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (_) => const Dashboard(),
+        builder: (_) => const MainNavigation(),
       ),
     );
   }

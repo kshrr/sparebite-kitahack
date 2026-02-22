@@ -1,3 +1,4 @@
+import 'dart:convert'; // ⭐ REQUIRED for base64
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -24,17 +25,14 @@ class MyListingsPage extends StatelessWidget {
 
         builder: (context, snapshot) {
 
-          // ---------- LOADING ----------
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
 
-          // ---------- ERROR ----------
           if (snapshot.hasError) {
             return const Center(child: Text("Something went wrong"));
           }
 
-          // ---------- EMPTY ----------
           if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
             return const Center(
               child: Text(
@@ -50,9 +48,7 @@ class MyListingsPage extends StatelessWidget {
             padding: const EdgeInsets.all(12),
             itemCount: listings.length,
             itemBuilder: (_, index) {
-              final data =
-                  listings[index].data() as Map<String, dynamic>;
-
+              final data = listings[index].data() as Map<String, dynamic>;
               return ListingCard(data: data);
             },
           );
@@ -79,7 +75,6 @@ class ListingCard extends StatelessWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
       ),
-
       child: Padding(
         padding: const EdgeInsets.all(14),
         child: Row(
@@ -88,19 +83,17 @@ class ListingCard extends StatelessWidget {
             // ---------- FOOD IMAGE ----------
             ClipRRect(
               borderRadius: BorderRadius.circular(12),
-              child: data["imageUrl"] != null
-                  ? Image.network(
-                      data["imageUrl"],
+              child: data["imageBase64"] != null
+                  ? Image.memory(
+                      base64Decode(data["imageBase64"]),
                       width: 90,
                       height: 90,
                       fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) =>
-                          const Icon(Icons.fastfood, size: 60),
                     )
                   : const Icon(Icons.fastfood, size: 60),
             ),
 
-            const SizedBox(width: 14),
+            const SizedBox(width: 14), // ⭐ spacing fix
 
             // ---------- DETAILS ----------
             Expanded(
@@ -108,7 +101,6 @@ class ListingCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
 
-                  // food name
                   Text(
                     data["foodName"] ?? "Unknown Food",
                     style: const TextStyle(
@@ -131,7 +123,6 @@ class ListingCard extends StatelessWidget {
 
                   const SizedBox(height: 8),
 
-                  // ---------- STATUS ----------
                   Container(
                     padding: const EdgeInsets.symmetric(
                         horizontal: 12, vertical: 5),

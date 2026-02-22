@@ -27,7 +27,6 @@ class _DashboardState extends State<Dashboard> {
   // ---------------- GET USER NGO STATUS ----------------
   Future<void> loadUserStatus() async {
     final uid = auth.currentUser!.uid;
-
     final doc = await firestore.collection("users").doc(uid).get();
 
     setState(() {
@@ -64,8 +63,15 @@ class _DashboardState extends State<Dashboard> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFF5F7FA),
+
       appBar: AppBar(
-        title: const Text("Sparebite"),
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        title: const Text(
+          "Sparebite",
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         centerTitle: true,
         actions: [
           IconButton(
@@ -81,110 +87,80 @@ class _DashboardState extends State<Dashboard> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
 
-            // ---------- WELCOME ----------
-            const Text(
-              "Welcome 👋",
-              style: TextStyle(
-                fontSize: 26,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-
-            const SizedBox(height: 8),
-
-            buildNGOStatusBadge(),
+            // HERO SECTION
+            buildHeroCard(),
 
             const SizedBox(height: 30),
 
-            // ---------- QUICK ACTIONS ----------
             const Text(
               "Quick Actions",
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
 
-            const SizedBox(height: 15),
+            const SizedBox(height: 16),
 
-            Row(
-              children: [
-                Expanded(
-                  child: actionCard(
-                    icon: Icons.add_circle,
-                    title: "Donate Food",
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const UploadFoodPage(),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-                const SizedBox(width: 15),
-                Expanded(
-                  child: actionCard(
-                    icon: Icons.history,
-                    title: "My Donations",
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const MyListingsPage(),
-                        ),
-                      );
-                    }
-                  ),
-                ),
-              ],
-            ),
+            buildActionGrid(),
 
-            const SizedBox(height: 15),
+            const SizedBox(height: 30),
 
-            Row(
-              children: [
-                Expanded(
-                  child: actionCard(
-                    icon: Icons.track_changes,
-                    title: "Matching Status",
-                    onTap: () {},
-                  ),
-                ),
-                const SizedBox(width: 15),
-                Expanded(
-                  child: actionCard(
-                    icon: Icons.volunteer_activism,
-                    title: "Apply as NGO",
-                    onTap: ngoStatus == "none" ? applyAsNGO : null,
-                  ),
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 40),
-
-            // ---------- IMPACT ----------
             const Text(
               "Your Impact",
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
 
-            const SizedBox(height: 15),
+            const SizedBox(height: 16),
 
-            Row(
-              children: [
-                Expanded(child: impactCard("Meals Saved", "24")),
-                const SizedBox(width: 15),
-                Expanded(child: impactCard("Donations", "5")),
-              ],
-            ),
+            buildImpactSection(),
           ],
         ),
+      ),
+    );
+  }
+
+  // ---------------- HERO CARD ----------------
+  Widget buildHeroCard() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(24),
+        gradient: const LinearGradient(
+          colors: [Color(0xFF2ECC71), Color(0xFF27AE60)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.green.withOpacity(0.3),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+          )
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+
+          const Text(
+            "Welcome back 👋",
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+
+          const SizedBox(height: 8),
+
+          const Text(
+            "Help reduce food waste and feed communities.",
+            style: TextStyle(color: Colors.white70),
+          ),
+
+          const SizedBox(height: 20),
+
+          buildNGOStatusBadge(),
+        ],
       ),
     );
   }
@@ -204,20 +180,72 @@ class _DashboardState extends State<Dashboard> {
         text = "NGO Application Pending";
         break;
       default:
-        color = Colors.grey;
+        color = Colors.white;
         text = "Community Member";
     }
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.15),
+        color: Colors.white.withOpacity(0.2),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Text(
         text,
-        style: TextStyle(color: color),
+        style: TextStyle(color: color, fontWeight: FontWeight.w600),
       ),
+    );
+  }
+
+  // ---------------- ACTION GRID ----------------
+  Widget buildActionGrid() {
+    return GridView.count(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      crossAxisCount: 2,
+      crossAxisSpacing: 15,
+      mainAxisSpacing: 15,
+      childAspectRatio: 1.1,
+      children: [
+
+        actionCard(
+          icon: Icons.add_circle_outline,
+          title: "Donate Food",
+          color: Colors.green,
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const UploadFoodPage()),
+            );
+          },
+        ),
+
+        actionCard(
+          icon: Icons.inventory_2_outlined,
+          title: "My Donations",
+          color: Colors.blue,
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const MyListingsPage()),
+            );
+          },
+        ),
+
+        actionCard(
+          icon: Icons.track_changes,
+          title: "Matching Status",
+          color: Colors.orange,
+          onTap: () {},
+        ),
+
+        actionCard(
+          icon: Icons.volunteer_activism,
+          title: "Apply as NGO",
+          color: Colors.purple,
+          onTap: ngoStatus == "none" ? applyAsNGO : null,
+        ),
+      ],
     );
   }
 
@@ -225,6 +253,7 @@ class _DashboardState extends State<Dashboard> {
   Widget actionCard({
     required IconData icon,
     required String title,
+    required Color color,
     required VoidCallback? onTap,
   }) {
     return GestureDetector(
@@ -232,40 +261,75 @@ class _DashboardState extends State<Dashboard> {
       child: Container(
         padding: const EdgeInsets.all(18),
         decoration: BoxDecoration(
-          color: Colors.green.shade50,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(20),
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              blurRadius: 15,
+              offset: const Offset(0, 8),
+              color: Colors.black.withOpacity(0.05),
+            ),
+          ],
         ),
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, size: 36, color: Colors.green),
-            const SizedBox(height: 10),
-            Text(title, textAlign: TextAlign.center),
+
+            Container(
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.12),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(icon, color: color, size: 28),
+            ),
+
+            const SizedBox(height: 12),
+
+            Text(
+              title,
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontWeight: FontWeight.w600),
+            ),
           ],
         ),
       ),
     );
   }
 
+  // ---------------- IMPACT SECTION ----------------
+  Widget buildImpactSection() {
+    return Row(
+      children: [
+        Expanded(child: impactCard("Meals Saved", "24", Icons.restaurant)),
+        const SizedBox(width: 15),
+        Expanded(child: impactCard("Donations", "5", Icons.favorite)),
+      ],
+    );
+  }
+
   // ---------------- IMPACT CARD ----------------
-  Widget impactCard(String title, String value) {
+  Widget impactCard(String title, String value, IconData icon) {
     return Container(
-      padding: const EdgeInsets.all(18),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            blurRadius: 10,
-            color: Colors.grey.withOpacity(0.2),
+            blurRadius: 12,
+            color: Colors.black.withOpacity(0.05),
           ),
         ],
       ),
       child: Column(
         children: [
+          Icon(icon, color: Colors.green, size: 32),
+          const SizedBox(height: 12),
           Text(
             value,
             style: const TextStyle(
-              fontSize: 24,
+              fontSize: 26,
               fontWeight: FontWeight.bold,
               color: Colors.green,
             ),

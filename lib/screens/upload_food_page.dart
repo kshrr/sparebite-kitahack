@@ -1,5 +1,5 @@
 import 'dart:io';
-import 'dart:typed_data';
+import 'dart:convert'; 
 
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
@@ -7,7 +7,6 @@ import 'package:image_picker/image_picker.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 
 class UploadFoodPage extends StatefulWidget {
   const UploadFoodPage({super.key});
@@ -76,88 +75,67 @@ class _UploadFoodPageState extends State<UploadFoodPage> {
   }
 
   // ================= UPLOAD FOOD =================
- Future<void> uploadFood() async {
-  final user = FirebaseAuth.instance.currentUser;
-
-  if (user == null) {
-    showError("Please login first");
-    return;
-  }
-
-  if (nameController.text.trim().isEmpty ||
-      quantityController.text.trim().isEmpty ||
-      locationController.text.trim().isEmpty ||
-      expiryTime == null ||
-      (imageFile == null && webImage == null)) {
-    showError("Please fill all fields");
-    return;
-  }
-
-  setState(() => isLoading = true);
-
+Future<void> uploadFood() async {
   try {
-    final uid = user.uid;
+    final user = FirebaseAuth.instance.currentUser;
 
-    print("Starting upload...");
-
-    // ---------- STORAGE UPLOAD ----------
-    final ref = FirebaseStorage.instance
-        .ref()
-        .child("food_images/${DateTime.now().millisecondsSinceEpoch}.jpg");
-
-    UploadTask uploadTask;
-
-    if (kIsWeb) {
-      uploadTask = ref.putData(webImage!);
-    } else {
-      uploadTask = ref.putFile(imageFile!);
+    if (user == null) {
+      showError("Please login first");
+      return;
     }
 
-    // timeout protection (VERY IMPORTANT)
-    final snapshot = await uploadTask.timeout(
-      const Duration(seconds: 20),
-      onTimeout: () {
-        throw Exception("Upload timeout. Check internet.");
-      },
-    );
+    if (nameController.text.trim().isEmpty ||
+        quantityController.text.trim().isEmpty ||
+        locationController.text.trim().isEmpty ||
+        expiryTime == null ||
+        (imageFile == null && webImage == null)) {
+      showError("Please fill all fields");
+      return;
+    }
 
-    final imageUrl = await snapshot.ref.getDownloadURL();
+    setState(() => isLoading = true);
 
-    print("Image uploaded: $imageUrl");
+    final uid = user.uid;
 
-    // ---------- FIRESTORE WRITE ----------
-    await FirebaseFirestore.instance
-        .collection("food_listings")
-        .add({
+    // ---------- CONVERT IMAGE TO BASE64 ----------
+    String base64Image;
+
+    if (kIsWeb) {
+      base64Image = base64Encode(webImage!);
+    } else {
+      final bytes = await imageFile!.readAsBytes();
+      base64Image = base64Encode(bytes);
+    }
+
+    print("Image converted to base64");
+
+    // ---------- SAVE TO FIRESTORE ----------
+    await FirebaseFirestore.instance.collection("food_listings").add({
       "foodName": nameController.text.trim(),
       "quantity": quantityController.text.trim(),
       "category": selectedCategory,
       "location": locationController.text.trim(),
       "expiryTime": Timestamp.fromDate(expiryTime!),
       "createdAt": Timestamp.now(),
-      "status": "pending",
-      "imageUrl": imageUrl,
+      "imageBase64": base64Image, // NEW FIELD
       "donorId": uid,
-    }).timeout(
-      const Duration(seconds: 10),
-      onTimeout: () => throw Exception("Database timeout"),
-    );
-
-    print("Firestore saved");
+      "status": "pending",
+    });
 
     if (!mounted) return;
 
     setState(() => isLoading = false);
 
-    Navigator.pop(context);
-
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text("Food uploaded successfully")),
     );
 
+    Navigator.pop(context);
+
   } catch (e) {
+    if (!mounted) return;
     setState(() => isLoading = false);
-    showError(e.toString());
+    showError("Upload failed: $e");
   }
 }
 
@@ -171,7 +149,6 @@ class _UploadFoodPageState extends State<UploadFoodPage> {
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
-
             // IMAGE PICKER
             GestureDetector(
               onTap: pickImage,
@@ -230,7 +207,10 @@ class _UploadFoodPageState extends State<UploadFoodPage> {
               value: selectedCategory,
               items: const [
                 DropdownMenuItem(value: "Meals", child: Text("Meals")),
-                DropdownMenuItem(value: "Baked Goods", child: Text("Baked Goods")),
+                DropdownMenuItem(
+                  value: "Baked Goods",
+                  child: Text("Baked Goods"),
+                ),
                 DropdownMenuItem(value: "Groceries", child: Text("Groceries")),
                 DropdownMenuItem(value: "Others", child: Text("Others")),
               ],
@@ -286,8 +266,9 @@ class _UploadFoodPageState extends State<UploadFoodPage> {
   }
 
   void showError(String message) {
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text(message)));
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override

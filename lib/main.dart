@@ -4,6 +4,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'screens/dashboard.dart';
 import 'screens/login.dart';
+import 'screens/main_navigation.dart';
 
 
 void main() async {
@@ -26,7 +27,7 @@ class FoodRescueApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: "Food Rescue",
       theme: ThemeData(primarySwatch: Colors.green),
-      home: const LandingPage(),
+      home: const AuthPage(),
 
     );
   }
