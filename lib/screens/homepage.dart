@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../app_colors.dart';
 import 'login.dart';
 
 class LandingPage extends StatefulWidget {
@@ -69,7 +70,7 @@ class _LandingPageState extends State<LandingPage> {
                       Icon(
                         Icons.food_bank,
                         size: 120,
-                        color: Colors.green.shade400,
+                        color: appPrimaryGreenLight,
                       ),
 
                       const SizedBox(height: 40),
@@ -112,7 +113,7 @@ class _LandingPageState extends State<LandingPage> {
                 height: currentPage == index ? 12 : 8,
                 decoration: BoxDecoration(
                   color: currentPage == index
-                      ? Colors.green
+                      ? appPrimaryGreen
                       : Colors.grey.shade300,
                   shape: BoxShape.circle,
                 ),
@@ -129,7 +130,7 @@ class _LandingPageState extends State<LandingPage> {
               width: double.infinity,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
+                  backgroundColor: appPrimaryGreen,
                   padding: const EdgeInsets.symmetric(vertical: 18),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(14),

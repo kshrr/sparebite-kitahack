@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../app_colors.dart';
 import 'dashboard.dart';
 import 'my_listings_page.dart';
 import 'upload_food_page.dart';
@@ -51,9 +52,9 @@ class _MainNavigationState extends State<MainNavigation> {
 
       // ⭐ FLOATING ADD BUTTON (center)
       floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.green,
+        backgroundColor: appPrimaryGreen,
         onPressed: () => onTabTapped(2),
-        child: const Icon(Icons.add),
+        child: const Icon(Icons.add, color: Colors.white),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
 
@@ -66,7 +67,6 @@ class _MainNavigationState extends State<MainNavigation> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-
               navItem(Icons.dashboard_outlined, "Home", 0),
               navItem(Icons.inventory_2_outlined, "Listings", 1),
 
@@ -89,14 +89,11 @@ class _MainNavigationState extends State<MainNavigation> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            icon,
-            color: isActive ? Colors.green : Colors.grey,
-          ),
+          Icon(icon, color: isActive ? appPrimaryGreen : Colors.grey),
           Text(
             label,
             style: TextStyle(
-              color: isActive ? Colors.green : Colors.grey,
+              color: isActive ? appPrimaryGreen : Colors.grey,
               fontSize: 12,
             ),
           ),

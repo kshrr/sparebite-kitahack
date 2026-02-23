@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../app_colors.dart';
 
 class NgoDashboard extends StatelessWidget {
   const NgoDashboard({super.key});
@@ -203,7 +204,7 @@ class PickupCard extends StatelessWidget {
             vertical: 5,
           ),
           decoration: BoxDecoration(
-            color: Colors.green.shade100,
+            color: appPrimaryGreenLightBg,
             borderRadius: BorderRadius.circular(10),
           ),
           child: const Text("Accepted"),
