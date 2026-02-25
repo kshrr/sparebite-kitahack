@@ -1,27 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
 import '../app_colors.dart';
 import 'dashboard.dart';
+import 'impact_page.dart';
 import 'my_listings_page.dart';
+import 'ngo_dashboard.dart';
+import 'profile_page.dart';
 import 'upload_food_page.dart';
-
-// temporary placeholders (you can replace later)
-class ImpactPage extends StatelessWidget {
-  const ImpactPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Center(child: Text("Impact Page"));
-  }
-}
-
-class ProfilePage extends StatelessWidget {
-  const ProfilePage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Center(child: Text("Profile Page"));
-  }
-}
 
 class MainNavigation extends StatefulWidget {
   const MainNavigation({super.key});
@@ -32,8 +19,10 @@ class MainNavigation extends StatefulWidget {
 
 class _MainNavigationState extends State<MainNavigation> {
   int currentIndex = 0;
+  bool isNgoUser = false;
+  bool isLoadingRole = true;
 
-  final pages = const [
+  final donorPages = const [
     Dashboard(),
     MyListingsPage(),
     UploadFoodPage(),
@@ -41,40 +30,96 @@ class _MainNavigationState extends State<MainNavigation> {
     ProfilePage(),
   ];
 
+  final ngoPages = const [
+    NgoDashboard(),
+    ImpactPage(),
+    ProfilePage(),
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserRole();
+  }
+
+  Future<void> _loadUserRole() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      if (!mounted) return;
+      setState(() => isLoadingRole = false);
+      return;
+    }
+
+    bool isNGO = false;
+    try {
+      final userDoc = await FirebaseFirestore.instance
+          .collection("users")
+          .doc(user.uid)
+          .get();
+      final data = userDoc.data() ?? <String, dynamic>{};
+      isNGO = data["isNGO"] == true || data["ngoStatus"] == "approved";
+    } catch (_) {
+      isNGO = false;
+    }
+
+    if (!mounted) return;
+    setState(() {
+      isNgoUser = isNGO;
+      isLoadingRole = false;
+      currentIndex = 0;
+    });
+  }
+
   void onTabTapped(int index) {
     setState(() => currentIndex = index);
   }
 
   @override
   Widget build(BuildContext context) {
+    if (isLoadingRole) {
+      return const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFA67C52)),
+          ),
+        ),
+      );
+    }
+
+    final pages = isNgoUser ? ngoPages : donorPages;
+
     return Scaffold(
       body: pages[currentIndex],
-
-      // ⭐ FLOATING ADD BUTTON (center)
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: appPrimaryGreen,
-        onPressed: () => onTabTapped(2),
-        child: const Icon(Icons.add, color: Colors.white),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-
-      // ⭐ BOTTOM NAV BAR
+      floatingActionButton: isNgoUser
+          ? null
+          : FloatingActionButton(
+              backgroundColor: appPrimaryGreen,
+              onPressed: () => onTabTapped(2),
+              child: const Icon(Icons.add, color: Colors.white),
+            ),
+      floatingActionButtonLocation: isNgoUser
+          ? FloatingActionButtonLocation.endFloat
+          : FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: BottomAppBar(
-        shape: const CircularNotchedRectangle(),
-        notchMargin: 8,
+        shape: isNgoUser ? null : const CircularNotchedRectangle(),
+        notchMargin: isNgoUser ? 0 : 8,
         child: SizedBox(
           height: 65,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              navItem(Icons.dashboard_outlined, "Home", 0),
-              navItem(Icons.inventory_2_outlined, "Listings", 1),
-
-              const SizedBox(width: 40), // space for FAB
-
-              navItem(Icons.bar_chart_outlined, "Impact", 3),
-              navItem(Icons.person_outline, "Profile", 4),
-            ],
+            children: isNgoUser
+                ? [
+                    navItem(Icons.volunteer_activism_outlined, "NGO", 0),
+                    navItem(Icons.bar_chart_outlined, "Impact", 1),
+                    navItem(Icons.person_outline, "Profile", 2),
+                  ]
+                : [
+                    navItem(Icons.dashboard_outlined, "Home", 0),
+                    navItem(Icons.inventory_2_outlined, "Listings", 1),
+                    const SizedBox(width: 40),
+                    navItem(Icons.bar_chart_outlined, "Impact", 3),
+                    navItem(Icons.person_outline, "Profile", 4),
+                  ],
           ),
         ),
       ),

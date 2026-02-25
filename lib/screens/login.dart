@@ -83,9 +83,9 @@ class _AuthPageState extends State<AuthPage>
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
-                  const Color(0xFF2ECC71).withOpacity(0.95),
-                  const Color(0xFF27AE60).withOpacity(0.95),
-                  const Color(0xFF229954).withOpacity(0.95),
+                  const Color(0xFFA67C52).withOpacity(0.95),
+                  const Color(0xFF9C7045).withOpacity(0.95),
+                  const Color(0xFF8B5E34).withOpacity(0.95),
                 ],
                 stops: const [0.0, 0.5, 1.0],
               ),
@@ -111,9 +111,9 @@ class _AuthPageState extends State<AuthPage>
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                       colors: [
-                        const Color(0xFF2ECC71).withOpacity(0.85),
-                        const Color(0xFF27AE60).withOpacity(0.90),
-                        const Color(0xFF229954).withOpacity(0.95),
+                        const Color(0xFFA67C52).withOpacity(0.85),
+                        const Color(0xFF9C7045).withOpacity(0.90),
+                        const Color(0xFF8B5E34).withOpacity(0.95),
                       ],
                     ),
                   ),
@@ -214,7 +214,7 @@ class _AuthPageState extends State<AuthPage>
                 fit: BoxFit.cover,
                 errorBuilder: (context, error, stackTrace) {
                   return Container(
-                    color: const Color(0xFF2ECC71),
+                    color: const Color(0xFFA67C52),
                     child: Icon(
                       Icons.restaurant_menu_rounded,
                       size: logoSize * 0.5,
@@ -225,7 +225,7 @@ class _AuthPageState extends State<AuthPage>
                 loadingBuilder: (context, child, loadingProgress) {
                   if (loadingProgress == null) return child;
                   return Container(
-                    color: const Color(0xFF2ECC71),
+                    color: const Color(0xFFA67C52),
                     child: const Center(
                       child: CircularProgressIndicator(
                         color: Colors.white,
@@ -326,12 +326,12 @@ class _AuthPageState extends State<AuthPage>
                   width: iconSize,
                   height: iconSize,
                   decoration: BoxDecoration(
-                    color: const Color(0xFF2ECC71).withOpacity(0.1),
+                    color: const Color(0xFFA67C52).withOpacity(0.1),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
                     Icons.fastfood_rounded,
-                    color: const Color(0xFF2ECC71),
+                    color: const Color(0xFFA67C52),
                     size: iconSize * 0.5,
                   ),
                 ),
@@ -458,7 +458,7 @@ class _AuthPageState extends State<AuthPage>
           fontSize: labelSize,
           fontWeight: FontWeight.w400,
         ),
-        prefixIcon: Icon(icon, color: const Color(0xFF2ECC71)),
+        prefixIcon: Icon(icon, color: const Color(0xFFA67C52)),
         filled: true,
         fillColor: Colors.grey[50],
         border: OutlineInputBorder(
@@ -471,7 +471,7 @@ class _AuthPageState extends State<AuthPage>
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(borderRadius),
-          borderSide: const BorderSide(color: Color(0xFF2ECC71), width: 2),
+          borderSide: const BorderSide(color: Color(0xFFA67C52), width: 2),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(borderRadius),
@@ -519,7 +519,7 @@ class _AuthPageState extends State<AuthPage>
           fontSize: labelSize,
           fontWeight: FontWeight.w400,
         ),
-        prefixIcon: const Icon(Icons.lock_outline, color: Color(0xFF2ECC71)),
+        prefixIcon: const Icon(Icons.lock_outline, color: Color(0xFFA67C52)),
         suffixIcon: IconButton(
           icon: Icon(
             isPasswordVisible ? Icons.visibility_off : Icons.visibility,
@@ -541,7 +541,7 @@ class _AuthPageState extends State<AuthPage>
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(borderRadius),
-          borderSide: const BorderSide(color: Color(0xFF2ECC71), width: 2),
+          borderSide: const BorderSide(color: Color(0xFFA67C52), width: 2),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(borderRadius),
@@ -569,13 +569,13 @@ class _AuthPageState extends State<AuthPage>
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(borderRadius),
         gradient: const LinearGradient(
-          colors: [Color(0xFF2ECC71), Color(0xFF27AE60)],
+          colors: [Color(0xFFA67C52), Color(0xFF9C7045)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF2ECC71).withOpacity(0.4),
+            color: const Color(0xFFA67C52).withOpacity(0.4),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
@@ -641,7 +641,7 @@ class _AuthPageState extends State<AuthPage>
           child: Text(
             isLogin ? "Sign Up" : "Sign In",
             style: TextStyle(
-              color: const Color(0xFF2ECC71),
+              color: const Color(0xFFA67C52),
               fontSize: fontSize,
               fontWeight: FontWeight.bold,
             ),
@@ -735,3 +735,4 @@ class _AuthPageState extends State<AuthPage>
     );
   }
 }
+
