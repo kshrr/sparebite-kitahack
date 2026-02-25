@@ -5,6 +5,7 @@ import '../app_colors.dart';
 import 'my_listings_page.dart';
 import 'upload_food_page.dart';
 import 'login.dart';
+import 'ngo_application_page.dart';
 
 class Dashboard extends StatefulWidget {
   const Dashboard({super.key});
@@ -131,22 +132,11 @@ class _DashboardState extends State<Dashboard> {
 
   // ---------------- APPLY AS NGO ----------------
   Future<void> applyAsNGO() async {
-    final uid = auth.currentUser!.uid;
-
-    await firestore.collection("users").doc(uid).update({
-      "ngoStatus": "pending",
-    });
-
-    setState(() => ngoStatus = "pending");
-
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("NGO application submitted"),
-          backgroundColor: Color(0xFF2ECC71),
-        ),
-      );
-    }
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const NgoApplicationPage()),
+    );
+    await loadUserData();
   }
 
   // ---------------- LOGOUT ----------------
@@ -171,7 +161,7 @@ class _DashboardState extends State<Dashboard> {
           await loadImpactStats();
           await loadUserData();
         },
-        color: const Color(0xFF2ECC71),
+        color: const Color(0xFFA67C52),
         child: CustomScrollView(
           slivers: [
             // Premium App Bar
@@ -180,7 +170,7 @@ class _DashboardState extends State<Dashboard> {
               floating: false,
               pinned: true,
               elevation: 0,
-              backgroundColor: const Color(0xFF2ECC71),
+              backgroundColor: const Color(0xFFA67C52),
               flexibleSpace: FlexibleSpaceBar(
                 title: const Text(
                   "Sparebite",
@@ -197,8 +187,8 @@ class _DashboardState extends State<Dashboard> {
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                       colors: [
-                        const Color(0xFF2ECC71),
-                        const Color(0xFF27AE60),
+                        const Color(0xFFA67C52),
+                        const Color(0xFF8B5E34),
                       ],
                     ),
                   ),
@@ -292,8 +282,8 @@ class _DashboardState extends State<Dashboard> {
         borderRadius: BorderRadius.circular(24),
         gradient: const LinearGradient(
           colors: [
-            const Color.fromARGB(255, 33, 133, 75),
-            const Color.fromARGB(255, 21, 117, 61),
+            Color(0xFFA67C52),
+            Color(0xFF8B5E34),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -529,10 +519,10 @@ class _DashboardState extends State<Dashboard> {
         Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: const Color(0xFF2ECC71).withOpacity(0.1),
+            color: const Color(0xFFA67C52).withOpacity(0.1),
             borderRadius: BorderRadius.circular(10),
           ),
-          child: Icon(icon, color: const Color(0xFF2ECC71), size: 20),
+          child: Icon(icon, color: const Color(0xFFA67C52), size: 20),
         ),
         const SizedBox(width: 12),
         Text(
@@ -552,7 +542,7 @@ class _DashboardState extends State<Dashboard> {
     if (isLoadingStats) {
       return const Center(
         child: CircularProgressIndicator(
-          valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF2ECC71)),
+          valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFA67C52)),
         ),
       );
     }
@@ -576,7 +566,7 @@ class _DashboardState extends State<Dashboard> {
               child: _buildMetricCard(
                 icon: Icons.eco,
                 value: "${impactStats['totalCO2']?.toStringAsFixed(1) ?? '0'}",
-                label: "CO₂ Saved (kg)",
+                label: "CO2 Saved (kg)",
                 color: Colors.blue,
                 subtitle: "Environmental impact",
               ),
@@ -720,7 +710,7 @@ class _DashboardState extends State<Dashboard> {
               ? Icons.volunteer_activism
               : Icons.verified_user,
           title: ngoStatus == "none" ? "Apply as NGO" : "NGO Status",
-          color: Colors.purple,
+          color: appPrimaryGreen,
           onTap: ngoStatus == "none" ? applyAsNGO : null,
         ),
       ],
@@ -786,7 +776,7 @@ class _DashboardState extends State<Dashboard> {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(
             child: CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF2ECC71)),
+              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFA67C52)),
             ),
           );
         }
@@ -1127,3 +1117,5 @@ extension StringExtension on String {
     return "${this[0].toUpperCase()}${substring(1)}";
   }
 }
+
+

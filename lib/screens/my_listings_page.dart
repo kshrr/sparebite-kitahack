@@ -30,7 +30,7 @@ class _MyListingsPageState extends State<MyListingsPage> {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
               child: CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF2ECC71)),
+                valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFA67C52)),
               ),
             );
           }
@@ -271,7 +271,7 @@ class _MyListingsPageState extends State<MyListingsPage> {
           _selectedFilter = value;
         });
       },
-      selectedColor: const Color(0xFF2ECC71),
+      selectedColor: const Color(0xFFA67C52),
       checkmarkColor: Colors.white,
       labelStyle: TextStyle(
         color: isSelected ? Colors.white : Colors.grey[700],
@@ -319,13 +319,13 @@ class _MyListingsPageState extends State<MyListingsPage> {
           Container(
             padding: const EdgeInsets.all(32),
             decoration: BoxDecoration(
-              color: const Color(0xFF2ECC71).withOpacity(0.1),
+              color: const Color(0xFFA67C52).withOpacity(0.1),
               shape: BoxShape.circle,
             ),
             child: const Icon(
               Icons.inventory_2_outlined,
               size: 80,
-              color: Color(0xFF2ECC71),
+              color: Color(0xFFA67C52),
             ),
           ),
           const SizedBox(height: 24),
@@ -410,8 +410,8 @@ class PremiumListingCard extends StatelessWidget {
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                         colors: [
-                          const Color(0xFF2ECC71).withOpacity(0.1),
-                          const Color(0xFF27AE60).withOpacity(0.1),
+                          const Color(0xFFA67C52).withOpacity(0.1),
+                          const Color(0xFF8B5E34).withOpacity(0.1),
                         ],
                       ),
                     ),
@@ -585,9 +585,9 @@ class PremiumListingCard extends StatelessWidget {
 
   Widget _buildPlaceholderImage() {
     return Container(
-      color: const Color(0xFFE8F5E9),
+      color: const Color(0xFFEADBC8),
       child: const Center(
-        child: Icon(Icons.fastfood, size: 60, color: Color(0xFF2ECC71)),
+        child: Icon(Icons.fastfood, size: 60, color: Color(0xFFA67C52)),
       ),
     );
   }
@@ -648,7 +648,7 @@ class PremiumListingCard extends StatelessWidget {
           Icon(
             _getCategoryIcon(category),
             size: 14,
-            color: const Color(0xFF2ECC71),
+            color: const Color(0xFFA67C52),
           ),
           const SizedBox(width: 6),
           Text(
@@ -668,7 +668,7 @@ class PremiumListingCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: const Color(0xFF2ECC71).withOpacity(0.05),
+        color: const Color(0xFFA67C52).withOpacity(0.05),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
@@ -677,7 +677,7 @@ class PremiumListingCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(icon, size: 18, color: const Color(0xFF2ECC71)),
+              Icon(icon, size: 18, color: const Color(0xFFA67C52)),
               const SizedBox(width: 6),
               Flexible(
                 child: Text(
@@ -718,12 +718,12 @@ class PremiumListingCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-        color: (color ?? const Color(0xFF2ECC71)).withOpacity(0.05),
+        color: (color ?? const Color(0xFFA67C52)).withOpacity(0.05),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
         children: [
-          Icon(icon, size: 18, color: color ?? const Color(0xFF2ECC71)),
+          Icon(icon, size: 18, color: color ?? const Color(0xFFA67C52)),
           const SizedBox(width: 10),
           Text(
             "$label: ",
@@ -878,3 +878,4 @@ class PremiumListingCard extends StatelessWidget {
     }
   }
 }
+
