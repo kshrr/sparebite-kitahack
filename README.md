@@ -13,15 +13,15 @@ SpareBite is an AI-powered food redistribution platform that connects surplus fo
 - Gemini API
 
 ## 🔐 Setup instruction
-1. Clone the repository
-2. Copy `.env.example` and rename it to `.env`
-3. Insert your Gemini API key inside `.env`:
+1. Clone the repository  
+2. Copy `.env.example` and rename it to `.env`  
+3. Insert your Gemini API key inside `.env`:  
 
-  GEMINI_API_KEY=your_key_here
+    GEMINI_API_KEY=your_key_here
 
-4. Run:
-flutter pub get
-flutter run
+4. Run:  
+flutter pub get  
+flutter run  
 
 ## 🔒 API Security
 
