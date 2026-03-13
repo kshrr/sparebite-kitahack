@@ -182,6 +182,8 @@ class ImpactPage extends StatelessWidget {
                           const SizedBox(height: 10),
                           _MetricBarChart(stats: stats, isNgo: isNgo),
                           const SizedBox(height: 18),
+                          _EducationSection(stats: stats, isNgo: isNgo),
+                          const SizedBox(height: 18),
                           _SectionTitle(
                             title: "Recent Activity",
                             icon: Icons.history_rounded,
@@ -618,6 +620,255 @@ class _MetricBarChart extends StatelessWidget {
   }
 }
 
+class _EducationSection extends StatelessWidget {
+  const _EducationSection({required this.stats, required this.isNgo});
+
+  final _ImpactStats stats;
+  final bool isNgo;
+
+  @override
+  Widget build(BuildContext context) {
+    final hasImpact = stats.meals > 0 || stats.co2 > 0 || stats.waterLitersEstimate > 0;
+    final title = isNgo ? "Why this NGO work matters" : "Why your donations matter";
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: appCardBg,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: appPrimaryGreen.withOpacity(0.06)),
+        boxShadow: [
+          BoxShadow(
+            color: appPrimaryGreen.withOpacity(0.06),
+            blurRadius: 14,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  color: appPrimaryGreenLightBg,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Icon(Icons.lightbulb_rounded,
+                    color: appPrimaryGreen, size: 18),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                    color: appTextPrimary,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            hasImpact
+                ? "So far you helped serve approximately ${stats.meals} meal(s), protected around ${_formatCompactLiters(stats.waterLitersEstimate)} of water and prevented about ${stats.co2.toStringAsFixed(1)} kg of CO₂ from being wasted."
+                : "Every rescued meal protects the water, land, and energy used to produce it and supports communities who need it most.",
+            style: const TextStyle(
+              color: appTextMuted,
+              fontSize: 13,
+              height: 1.5,
+            ),
+          ),
+          const SizedBox(height: 10),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: TextButton.icon(
+              onPressed: () {
+                _showEducationSheet(context, isNgo: isNgo, stats: stats);
+              },
+              icon: const Icon(Icons.menu_book_rounded, size: 18),
+              label: const Text("Learn how this helps food security"),
+              style: TextButton.styleFrom(
+                foregroundColor: appPrimaryGreen,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  static void _showEducationSheet(
+    BuildContext context, {
+    required bool isNgo,
+    required _ImpactStats stats,
+  }) {
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: appCardBg,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (ctx) {
+        final meals = stats.meals;
+        final water = stats.waterLitersEstimate;
+        final co2 = stats.co2;
+        final roleText = isNgo ? "Your NGO" : "Your donations";
+
+        return Padding(
+          padding: EdgeInsets.only(
+            left: 20,
+            right: 20,
+            top: 18,
+            bottom: MediaQuery.of(ctx).viewInsets.bottom + 24,
+          ),
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "How this changes real lives",
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w800,
+                        color: appTextPrimary,
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.close_rounded),
+                      onPressed: () => Navigator.of(ctx).pop(),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  "$roleText keeps surplus food in the food system instead of the landfill.",
+                  style: const TextStyle(
+                    fontSize: 13,
+                    color: appTextMuted,
+                    height: 1.4,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                _educationPoint(
+                  icon: Icons.restaurant_rounded,
+                  title: "People fed",
+                  body: meals > 0
+                      ? "You have helped serve about $meals meal(s). In many communities, one rescued meal can be the only hot meal someone eats that day."
+                      : "Every donated tray of food is turned into individual plates that reach families, shelters, and community kitchens.",
+                ),
+                const SizedBox(height: 12),
+                _educationPoint(
+                  icon: Icons.water_drop_rounded,
+                  title: "Water footprint",
+                  body: water > 0
+                      ? "Producing the food you rescued used roughly ${_formatCompactLiters(water)} of water. Rescuing it means that water is not wasted."
+                      : "Producing 1 kg of staples like rice can use ~2500 L of water. When food is thrown away, all of that hidden water is wasted too.",
+                ),
+                const SizedBox(height: 12),
+                _educationPoint(
+                  icon: Icons.eco_rounded,
+                  title: "Climate impact",
+                  body: co2 > 0
+                      ? "If the food you rescued had gone to waste, it could have generated about ${co2.toStringAsFixed(1)} kg of CO₂. Food rescue slows down climate change."
+                      : "When food rots in landfills it releases methane, a greenhouse gas many times stronger than CO₂. Rescue turns waste into climate action.",
+                ),
+                const SizedBox(height: 16),
+                const Text(
+                  "What you can do next:",
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    color: appTextPrimary,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                const Text(
+                  "• Keep posting surplus early, before it expires.\n"
+                  "• Share this dashboard with your team to inspire more donations.\n"
+                  "• Explore how regular donations could support nearby communities every week.",
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: appTextMuted,
+                    height: 1.5,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  static Widget _educationPoint({
+    required IconData icon,
+    required String title,
+    required String body,
+  }) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: 30,
+          height: 30,
+          decoration: BoxDecoration(
+            color: appPrimaryGreenLightBg,
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Icon(icon, color: appPrimaryGreen, size: 18),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                  color: appTextPrimary,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                body,
+                style: const TextStyle(
+                  fontSize: 12,
+                  color: appTextMuted,
+                  height: 1.5,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  static String _formatCompactLiters(double value) {
+    if (value >= 1000000) {
+      return "${(value / 1000000).toStringAsFixed(1)}M L";
+    }
+    if (value >= 1000) {
+      return "${(value / 1000).toStringAsFixed(1)}K L";
+    }
+    return "${value.toStringAsFixed(0)} L";
+  }
+}
+
 class _BarItem {
   _BarItem(this.label, this.value, this.color);
   final String label;
@@ -908,4 +1159,9 @@ class _ImpactStats {
     if (value is int) return value.toDouble();
     return double.tryParse(value?.toString() ?? "");
   }
+
+  // Approximate water footprint in liters from meals rescued.
+  // If one meal ~ 0.4 kg and 1 kg staples ~ 2500 L, then:
+  // water ≈ meals * 0.4 * 2500 ≈ meals * 1000.
+  double get waterLitersEstimate => meals * 1000.0;
 }

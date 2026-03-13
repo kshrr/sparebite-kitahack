@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import '../app_colors.dart';
 import '../services/pickup_verification_service.dart';
 import '../widgets/future_ui.dart';
+import 'my_impact_dashboard.dart';
 import 'qr_scanner_screen.dart';
 
 class DonationDetailScreen extends StatefulWidget {
@@ -24,6 +25,7 @@ class _DonationDetailScreenState extends State<DonationDetailScreen> {
   final _verificationService = PickupVerificationService();
   bool _isVerifying = false;
   bool _isPreparingPickup = false;
+  bool _hasShownAcceptedImpact = false;
 
   @override
   void initState() {
@@ -230,6 +232,8 @@ class _DonationDetailScreenState extends State<DonationDetailScreen> {
 
           final data = snapshot.data!.data() ?? <String, dynamic>{};
           final status = (data["status"] ?? "pending").toString().toLowerCase();
+
+          _maybeShowAcceptedImpactPopup(data, status);
           final canScan = status == "assigned" ||
               status == "accepted" ||
               status == "ready_for_pickup";
@@ -428,6 +432,131 @@ class _DonationDetailScreenState extends State<DonationDetailScreen> {
         if (status.isEmpty) return "Pending";
         return status[0].toUpperCase() + status.substring(1);
     }
+  }
+
+  void _maybeShowAcceptedImpactPopup(
+    Map<String, dynamic> data,
+    String status,
+  ) {
+    if (_hasShownAcceptedImpact) return;
+
+    final currentUserId = _auth.currentUser?.uid;
+    if (currentUserId == null) return;
+
+    // Only show for the donor who created this listing.
+    final donorId = (data["donorId"] ?? "").toString();
+    if (donorId.isEmpty || donorId != currentUserId) return;
+
+    // Show once the NGO has accepted or the donation is further along.
+    const acceptedStatuses = <String>{
+      "assigned",
+      "accepted",
+      "ready_for_pickup",
+      "picked_up",
+      "delivered",
+      "completed",
+    };
+    if (!acceptedStatuses.contains(status)) return;
+
+    final impact = (data["impact"] as Map<String, dynamic>?) ?? <String, dynamic>{};
+    final peopleFed = _toInt(impact["peopleFed"]);
+    final waterLiters = _toInt(impact["waterUsedLiters"]);
+    final co2Saved = _toDouble(impact["co2SavedKg"]);
+    final educationTip = (impact["educationTip"] ?? "").toString();
+
+    // Avoid meaningless popup if there is no impact information at all.
+    if (peopleFed <= 0 && waterLiters <= 0 && co2Saved <= 0) return;
+
+    _hasShownAcceptedImpact = true;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      showDialog<void>(
+        context: context,
+        builder: (dialogContext) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+            title: const Text("Your donation was accepted 🎉"),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  "Here’s how this pickup helps in the real world:",
+                  style: TextStyle(fontSize: 14),
+                ),
+                const SizedBox(height: 10),
+                if (peopleFed > 0)
+                  Text(
+                    "• People Fed: $peopleFed",
+                    style: const TextStyle(fontSize: 13),
+                  ),
+                if (waterLiters > 0)
+                  Text(
+                    "• Water Used to Produce This Food: ${_formatCompactNumber(waterLiters)} L",
+                    style: const TextStyle(fontSize: 13),
+                  ),
+                if (co2Saved > 0)
+                  Text(
+                    "• CO₂ Emissions Prevented: ${co2Saved.toStringAsFixed(1)} kg",
+                    style: const TextStyle(fontSize: 13),
+                  ),
+                const SizedBox(height: 10),
+                Text(
+                  educationTip.isNotEmpty
+                      ? educationTip
+                      : "Producing 1kg of rice can require around 2,500 liters of water. By rescuing surplus food, you protect the resources that went into growing, transporting, and cooking it.",
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: appTextMuted,
+                    height: 1.4,
+                  ),
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(dialogContext).pop();
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => const MyImpactDashboard(),
+                    ),
+                  );
+                },
+                child: const Text("View My Impact"),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(dialogContext).pop(),
+                child: const Text("Close"),
+              ),
+            ],
+          );
+        },
+      );
+    });
+  }
+
+  int _toInt(dynamic value) {
+    if (value is int) return value;
+    if (value is double) return value.round();
+    return int.tryParse(value.toString()) ?? 0;
+  }
+
+  double _toDouble(dynamic value) {
+    if (value is double) return value;
+    if (value is int) return value.toDouble();
+    return double.tryParse(value.toString()) ?? 0.0;
+  }
+
+  String _formatCompactNumber(int value) {
+    if (value >= 1000000) {
+      return "${(value / 1000000).toStringAsFixed(1)}M";
+    }
+    if (value >= 1000) {
+      return "${(value / 1000).toStringAsFixed(1)}K";
+    }
+    return value.toString();
   }
 
   String _generatePickupToken() {

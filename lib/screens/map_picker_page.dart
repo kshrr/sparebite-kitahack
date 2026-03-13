@@ -47,9 +47,13 @@ class _MapPickerPageState extends State<MapPickerPage> {
       body: Stack(
         children: [
           GoogleMap(
-            initialCameraPosition: CameraPosition(target: initialTarget, zoom: 13),
-            myLocationEnabled: true,
-            myLocationButtonEnabled: true,
+            initialCameraPosition: CameraPosition(
+              target: initialTarget,
+              zoom: 13,
+            ),
+            // Avoid requiring runtime location permissions: user can still tap to pick.
+            myLocationEnabled: false,
+            myLocationButtonEnabled: false,
             onTap: (latLng) {
               setState(() => _selected = latLng);
             },

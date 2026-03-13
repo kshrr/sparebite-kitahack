@@ -723,7 +723,7 @@ class _PremiumListingCardState extends State<PremiumListingCard> {
             children: [
               // Image Section — 1:1 square, fixed size to avoid collision
               SizedBox(
-                width: 200,
+                width: 180,
                 height: 210,
                 child: Stack(
                   fit: StackFit.expand,
