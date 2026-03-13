@@ -53,9 +53,7 @@ class MyImpactDashboard extends StatelessWidget {
                   ),
                   centerTitle: true,
                   background: Container(
-                    decoration: const BoxDecoration(
-                      gradient: appHeroGradient,
-                    ),
+                    decoration: const BoxDecoration(gradient: appHeroGradient),
                     child: SafeArea(
                       child: Padding(
                         padding: const EdgeInsets.fromLTRB(20, 18, 20, 0),
@@ -137,6 +135,196 @@ class MyImpactDashboard extends StatelessWidget {
           );
         },
       ),
+    );
+  }
+
+  Widget buildEducationCard({
+    required BuildContext context,
+    required _ImpactTotals totals,
+  }) {
+    final hasImpact =
+        totals.peopleFed > 0 || totals.co2Kg > 0 || totals.waterLiters > 0;
+    final title = "Why your donations matter";
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: appCardBg,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: appPrimaryGreen.withOpacity(0.06)),
+        boxShadow: [
+          BoxShadow(
+            color: appPrimaryGreen.withOpacity(0.06),
+            blurRadius: 14,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  color: appPrimaryGreenLightBg,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Icon(
+                  Icons.lightbulb_rounded,
+                  color: appPrimaryGreen,
+                  size: 18,
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                    color: appTextPrimary,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            hasImpact
+                ? "So far you helped serve approximately ${totals.peopleFed} meal(s), protected around ${_formatCompactNumber(totals.waterLiters)} of water and prevented about ${totals.co2Kg.toStringAsFixed(1)} kg of CO₂ from being wasted."
+                : "Every rescued meal protects the water, land, and energy used to produce it and supports communities who need it most.",
+            style: const TextStyle(
+              color: appTextMuted,
+              fontSize: 13,
+              height: 1.5,
+            ),
+          ),
+          const SizedBox(height: 10),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: TextButton.icon(
+              onPressed: () {
+                _showEducationSheet(context, totals: totals);
+              },
+              icon: const Icon(Icons.menu_book_rounded, size: 18),
+              label: const Text("Learn how this helps food security"),
+              style: TextButton.styleFrom(foregroundColor: appPrimaryGreen),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Education Sheet Modal to show impact details for the actual current totals
+  void _showEducationSheet(BuildContext context, {required _ImpactTotals totals}) {
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: appCardBg,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (ctx) {
+        final meals = totals.peopleFed;
+        final water = totals.waterLiters;
+        final co2 = totals.co2Kg;
+
+        return Padding(
+          padding: EdgeInsets.only(
+            left: 20,
+            right: 20,
+            top: 18,
+            bottom: MediaQuery.of(ctx).viewInsets.bottom + 24,
+          ),
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      "How this changes real lives",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w800,
+                        color: appTextPrimary,
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.close_rounded),
+                      onPressed: () => Navigator.of(ctx).pop(),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  meals > 0 || water > 0 || co2 > 0
+                      ? "Your impact so far:"
+                      : "Every rescued meal protects the water, land, and energy used to produce it and supports communities who need it most.",
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                    color: appPrimaryGreen,
+                  ),
+                ),
+                if (meals > 0 || water > 0 || co2 > 0)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (meals > 0)
+                          Text(
+                            "• Meals shared: $meals",
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: appTextPrimary,
+                            ),
+                          ),
+                        if (water > 0)
+                          Text(
+                            "• Water protected: ${_formatCompactNumber(water)} L",
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: appTextPrimary,
+                            ),
+                          ),
+                        if (co2 > 0)
+                          Text(
+                            "• CO₂ emissions prevented: ${co2.toStringAsFixed(1)} kg",
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: appTextPrimary,
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                const SizedBox(height: 6),
+                // Education content
+                const Text(
+                  "Rescuing food helps prevent waste and multiplies the effect of every meal:\n\n"
+                  "• Each saved meal protects the water, land, and energy used to produce it.\n"
+                  "• Food rescue helps communities in need and reduces your environmental footprint.\n"
+                  "• Every kilogram of food waste avoided prevents nearly 2.5 kg of CO₂ emissions and over 1,500 liters of water.",
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: appTextMuted,
+                    height: 1.5,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -391,7 +579,11 @@ class _MetricBarCard extends StatelessWidget {
     final bars = [
       _BarItem("People fed", totals.peopleFed.toDouble(), appPrimaryGreen),
       _BarItem("CO2 (kg)", totals.co2Kg, appAccentCyan),
-      _BarItem("Water (L)", totals.waterLiters.toDouble(), appPrimaryGreenLight),
+      _BarItem(
+        "Water (L)",
+        totals.waterLiters.toDouble(),
+        appPrimaryGreenLight,
+      ),
       _BarItem("Food (kg)", totals.foodKg, appAccentWarm),
     ];
 
@@ -576,10 +768,7 @@ class _ProgressCard extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             footnote,
-            style: const TextStyle(
-              color: appTextMuted,
-              fontSize: 12,
-            ),
+            style: const TextStyle(color: appTextMuted, fontSize: 12),
           ),
         ],
       ),
@@ -635,8 +824,7 @@ class _RecentImpactList extends StatelessWidget {
           final impact = (data["impact"] as Map<String, dynamic>?) ?? {};
           final foodName = (data["foodName"] ?? "Food item").toString();
           final peopleFed = _ImpactTotals._toInt(impact["peopleFed"]);
-          final co2Saved =
-              _ImpactTotals._toDouble(impact["co2SavedKg"]) ?? 0.0;
+          final co2Saved = _ImpactTotals._toDouble(impact["co2SavedKg"]) ?? 0.0;
 
           return Column(
             children: [
@@ -665,10 +853,7 @@ class _RecentImpactList extends StatelessWidget {
                 ),
                 subtitle: Text(
                   "People fed: $peopleFed · CO2: ${co2Saved.toStringAsFixed(1)} kg",
-                  style: const TextStyle(
-                    color: appTextMuted,
-                    fontSize: 12,
-                  ),
+                  style: const TextStyle(color: appTextMuted, fontSize: 12),
                 ),
               ),
               if (index != docs.length - 1)
