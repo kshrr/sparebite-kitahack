@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../app_colors.dart';
 import '../widgets/future_ui.dart';
 import 'donation_detail_screen.dart';
+import 'my_impact_dashboard.dart';
 import '../services/ngo_matching_service.dart';
 
 class MyListingsPage extends StatefulWidget {
@@ -16,6 +17,7 @@ class MyListingsPage extends StatefulWidget {
 
 class _MyListingsPageState extends State<MyListingsPage> {
   String _selectedFilter = "all";
+  final Set<String> _impactPopupShownFor = <String>{};
 
   @override
   Widget build(BuildContext context) {
@@ -59,6 +61,8 @@ class _MyListingsPageState extends State<MyListingsPage> {
             }
 
             final allListings = snapshot.data!.docs;
+            _maybeShowImpactPopup(allListings);
+            _maybeShowImpactPopup(allListings);
             final filteredListings = _selectedFilter == "all"
                 ? allListings
                 : allListings.where((doc) {
@@ -334,6 +338,130 @@ class _MyListingsPageState extends State<MyListingsPage> {
       'assigned': assigned,
       'delivered': delivered,
     };
+  }
+
+  void _maybeShowImpactPopup(List<QueryDocumentSnapshot> listings) {
+    if (!mounted || listings.isEmpty) return;
+
+    for (final doc in listings) {
+      final id = doc.id;
+      if (_impactPopupShownFor.contains(id)) continue;
+
+      final data = doc.data() as Map<String, dynamic>;
+      final status = (data["status"] ?? "pending").toString().toLowerCase();
+      const acceptedStatuses = <String>{
+        "assigned",
+        "accepted",
+        "ready_for_pickup",
+        "picked_up",
+        "delivered",
+        "completed",
+      };
+      if (!acceptedStatuses.contains(status)) continue;
+
+      final impact =
+          (data["impact"] as Map<String, dynamic>?) ?? <String, dynamic>{};
+      final peopleFed = _toIntSafe(impact["peopleFed"]);
+      final waterLiters = _toIntSafe(impact["waterUsedLiters"]);
+      final co2Saved = _toDoubleSafe(impact["co2SavedKg"]);
+      final educationTip = (impact["educationTip"] ?? "").toString();
+
+      if (peopleFed <= 0 && waterLiters <= 0 && co2Saved <= 0) continue;
+
+      _impactPopupShownFor.add(id);
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        showDialog<void>(
+          context: context,
+          builder: (dialogContext) {
+            return AlertDialog(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(18)),
+              title: const Text("Your donation was accepted 🎉"),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    "Here’s how this pickup helps in the real world:",
+                    style: TextStyle(fontSize: 14),
+                  ),
+                  const SizedBox(height: 10),
+                  if (peopleFed > 0)
+                    Text(
+                      "• People Fed: $peopleFed",
+                      style: const TextStyle(fontSize: 13),
+                    ),
+                  if (waterLiters > 0)
+                    Text(
+                      "• Water Used to Produce This Food: ${_formatCompactNumber(waterLiters)} L",
+                      style: const TextStyle(fontSize: 13),
+                    ),
+                  if (co2Saved > 0)
+                    Text(
+                      "• CO₂ Emissions Prevented: ${co2Saved.toStringAsFixed(1)} kg",
+                      style: const TextStyle(fontSize: 13),
+                    ),
+                  const SizedBox(height: 10),
+                  Text(
+                    educationTip.isNotEmpty
+                        ? educationTip
+                        : "Producing 1kg of rice can require around 2,500 liters of water. By rescuing surplus food, you protect the resources that went into growing, transporting, and cooking it.",
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: appTextMuted,
+                      height: 1.4,
+                    ),
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(dialogContext).pop();
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => const MyImpactDashboard(),
+                      ),
+                    );
+                  },
+                  child: const Text("View My Impact"),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.of(dialogContext).pop(),
+                  child: const Text("Close"),
+                ),
+              ],
+            );
+          },
+        );
+      });
+
+      break;
+    }
+  }
+
+  static int _toIntSafe(dynamic value) {
+    if (value is int) return value;
+    if (value is double) return value.round();
+    return int.tryParse(value?.toString() ?? "") ?? 0;
+  }
+
+  static double _toDoubleSafe(dynamic value) {
+    if (value is double) return value;
+    if (value is int) return value.toDouble();
+    return double.tryParse(value?.toString() ?? "") ?? 0.0;
+  }
+
+  static String _formatCompactNumber(int value) {
+    if (value >= 1000000) {
+      return "${(value / 1000000).toStringAsFixed(1)}M";
+    }
+    if (value >= 1000) {
+      return "${(value / 1000).toStringAsFixed(1)}K";
+    }
+    return value.toString();
   }
 
   Widget _buildEmptyState() {
