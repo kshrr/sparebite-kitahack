@@ -209,7 +209,7 @@ class _AuthPageState extends State<AuthPage> {
                       if (!isLogin) ...[
                         const SizedBox(height: 16),
                         DropdownButtonFormField<String>(
-                          value: selectedRole,
+                          initialValue: selectedRole,
                           decoration: InputDecoration(
                             prefixIcon: Icon(
                               Icons.badge_outlined,

@@ -291,7 +291,7 @@ class _SummaryCard extends StatelessWidget {
           Container(width: 1, height: 36, color: Colors.white30),
           Expanded(
             child: _GradientStat(
-              value: "${totals.foodKg.toStringAsFixed(1)}",
+              value: totals.foodKg.toStringAsFixed(1),
               label: "Food (kg)",
             ),
           ),

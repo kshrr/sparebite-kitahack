@@ -230,7 +230,7 @@ class _NgoPickupDetailScreenState extends State<NgoPickupDetailScreen> {
                   : Image.memory(
                       base64Decode(imageBase64),
                       fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) {
+                      errorBuilder: (_, _, _) {
                         return Container(
                           color: appPrimaryGreenLightBg,
                           child: Icon(

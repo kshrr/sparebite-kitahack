@@ -438,7 +438,7 @@ class CompactListingCard extends StatelessWidget {
                             ? Image.memory(
                                 base64Decode(data["imageBase64"]),
                                 fit: BoxFit.cover,
-                                errorBuilder: (_, __, ___) =>
+                                errorBuilder: (_, _, _) =>
                                     _placeholderIcon(),
                               )
                             : _placeholderIcon(),
@@ -743,7 +743,7 @@ class _PremiumListingCardState extends State<PremiumListingCard> {
                           ? Image.memory(
                               base64Decode(data["imageBase64"]),
                               fit: BoxFit.cover,
-                              errorBuilder: (_, __, ___) =>
+                              errorBuilder: (_, _, _) =>
                                   _buildPlaceholderImage(),
                             )
                           : _buildPlaceholderImage(),
